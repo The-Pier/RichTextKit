@@ -42,6 +42,20 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         if let image = pasteboard.image {
             return pasteImage(image, at: selectedRange.location)
         }
+        let images = pasteboard.pasteboardItems?.compactMap {
+            if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
+               let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
+                let fileExtension = url.pathExtension.lowercased()
+                let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
+                if imageExtensions.contains(fileExtension) {
+                    return image
+                }
+            }
+            return nil
+        } ?? [ImageRepresentable]()
+        if images.count > 0 {
+            return pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
+        }
         super.paste(sender)
     }
 

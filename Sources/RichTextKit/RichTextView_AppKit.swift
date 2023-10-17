@@ -48,7 +48,8 @@ open class RichTextView: NSTextView, RichTextViewComponent {
                 let fileExtension = url.pathExtension.lowercased()
                 let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
                 if imageExtensions.contains(fileExtension) {
-                    return pasteImage(image, at: selectedRange.location)
+                    pasteImage(image, at: selectedRange.location)
+                    return image
                 }
             }
             return nil

@@ -12,7 +12,7 @@ import AppKit
 /**
  This is a platform-agnostic rich text view that can be used
  in both UIKit and AppKit.
-
+ 
  The view inhertits `NSTextField` in AppKit and `UITextField`
  in UIKit. It aims to make these views behave more alike and
  make them implement ``RichTextViewComponent``, which is the
@@ -24,42 +24,42 @@ import AppKit
  supports images.
  */
 open class RichTextView: NSTextView, RichTextViewComponent {
-
+    
     // MARK: - Properties
     
     /// The style to use when highlighting text in the view.
     public var highlightingStyle: RichTextHighlightingStyle = .standard
-
+    
     /// The image configuration to use by the rich text view.
     public var imageConfiguration: RichTextImageConfiguration = .disabled
-
-
+    
+    
     // MARK: - Overrides
-
+    
     /// Paste the current pasteboard content into the view.
     open override func paste(_ sender: Any?) {
         let pasteboard = NSPasteboard.general
-        if let image = pasteboard.image {
-            return pasteImage(image, at: selectedRange.location)
-        }
-        let images = pasteboard.pasteboardItems?.compactMap {
-            if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
-               let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
-                let fileExtension = url.pathExtension.lowercased()
-                let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
-                if imageExtensions.contains(fileExtension) {
-                    pasteImage(image, at: selectedRange.location)
-                    return image
+        if pasteboard.hasImages {
+            let images = pasteboard.pasteboardItems?.compactMap {
+                if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
+                   let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
+                    let fileExtension = url.pathExtension.lowercased()
+                    let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
+                    if imageExtensions.contains(fileExtension) {
+                        return image
+                    }
                 }
+                return nil
+            } ?? [ImageRepresentable]()
+            if images.count > 0 {
+                pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             }
-            return nil
-        } ?? [ImageRepresentable]()
-        if images.count > 0 {
-            return pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
         }
-        super.paste(sender)
+        else {
+            super.paste(sender)
+        }
     }
-
+    
     /**
      Try to perform a certain drag operation, which will get
      and paste images from the drag info into the text.
@@ -87,17 +87,17 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         }
         return super.performDragOperation(draggingInfo)
     }
-
-
+    
+    
     // MARK: - Setup
-
+    
     /**
      Setup the rich text view with a rich text and a certain
      ``RichTextDataFormat``.
-
+     
      - Parameters:
-       - text: The text to edit with the text view.
-       - format: The rich text format to edit.
+     - text: The text to edit with the text view.
+     - format: The rich text format to edit.
      */
     open func setup(
         with text: NSAttributedString,
@@ -116,17 +116,17 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         layoutManager?.defaultAttachmentScaling = NSImageScaling.scaleProportionallyDown
         setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
-
-
+    
+    
     // MARK: - Open Functionality
-
+    
     /**
      Alert a certain title and message.
-
+     
      - Parameters:
-       - title: The alert title.
-       - message: The alert message.
-       - buttonTitle: The alert button title.
+     - title: The alert title.
+     - message: The alert message.
+     - buttonTitle: The alert button title.
      */
     open func alert(title: String, message: String, buttonTitle: String) {
         let alert = NSAlert()
@@ -136,7 +136,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         alert.addButton(withTitle: buttonTitle)
         alert.runModal()
     }
-
+    
     /// Copy the current selection.
     open func copySelection() {
         let pasteboard = NSPasteboard.general
@@ -145,22 +145,22 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         pasteboard.clearContents()
         pasteboard.setString(text.string, forType: .string)
     }
-
+    
     /// Try to redo the latest undone change.
     open func redoLatestChange() {
         undoManager?.redo()
     }
-
+    
     /// Scroll to a certain range.
     open func scroll(to range: NSRange) {
         scrollRangeToVisible(range)
     }
-
+    
     /// Set the rich text in the text view.
     open func setRichText(_ text: NSAttributedString) {
         attributedString = text
     }
-
+    
     /// Undo the latest change.
     open func undoLatestChange() {
         undoManager?.undo()
@@ -171,10 +171,10 @@ open class RichTextView: NSTextView, RichTextViewComponent {
 // MARK: - Public Extensions
 
 public extension RichTextView {
-
+    
     /**
      The spacing between the text view's edge and its text.
-
+     
      This is an alias for `textContainerInset`, to make sure
      that the text view has a platform-agnostic API.
      */
@@ -188,13 +188,13 @@ public extension RichTextView {
 // MARK: - RichTextProvider
 
 public extension RichTextView {
-
+    
     /// Get the rich text that is managed by the view.
     var attributedString: NSAttributedString {
         get { attributedString() }
         set { textStorage?.setAttributedString(newValue) }
     }
-
+    
     /// Whether or not the text view is the first responder.
     var isFirstResponder: Bool {
         window?.firstResponder == self
@@ -205,7 +205,7 @@ public extension RichTextView {
 // MARK: - RichTextWriter
 
 public extension RichTextView {
-
+    
     // Get the rich text that is managed by the view.
     var mutableAttributedString: NSMutableAttributedString? {
         textStorage

@@ -12,4 +12,13 @@ class RichTextCallbacks {
     var urlCallback: ((URL) -> Void)?
     var dataCallback: ((Data) -> Void)?
     
+    
+    func sendURL(url : URL) {
+            // Notify the main app about the URL
+            urlCallback?(url)
+        }
+    
+    func sendData(data : Data) {
+        dataCallback?(data)
+    }
 }

@@ -44,7 +44,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
             let images = pasteboard.pasteboardItems?.compactMap {
                 if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
                    let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
-                    RichTextCallbacks().urlCallback?(url)
+                    RichTextCallbacks().sendURL(url: url)
                     let fileExtension = url.pathExtension.lowercased()
                     let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
                     if imageExtensions.contains(fileExtension) {
@@ -54,8 +54,8 @@ open class RichTextView: NSTextView, RichTextViewComponent {
                 return nil
             } ?? [ImageRepresentable]()
             if images.count > 0 {
-                ForEach(images){image in
-                    RichTextCallbacks().dataCallback?(JSONEncoder().encode(image))
+                for indeces in 0...images.count{
+                    RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces]))
                 }
                 pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             }
@@ -78,7 +78,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         let images = pasteboard.pasteboardItems?.compactMap {
             if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
                let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
-                RichTextCallbacks().urlCallback?(url)
+                RichTextCallbacks().sendURL(url: url)
                 let fileExtension = url.pathExtension.lowercased()
                 let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
                 if imageExtensions.contains(fileExtension) {
@@ -88,8 +88,8 @@ open class RichTextView: NSTextView, RichTextViewComponent {
             return nil
         } ?? [ImageRepresentable]()
         if images.count > 0 {
-            ForEach(images){image in
-                RichTextCallbacks().dataCallback?(JSONEncoder().encode(image))
+            for indeces in 0...images.count{
+                RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces]))
             }
             pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             return true

@@ -8,6 +8,7 @@
 
 #if os(macOS)
 import AppKit
+import SwiftUI
 
 /**
  This is a platform-agnostic rich text view that can be used
@@ -43,7 +44,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
             let images = pasteboard.pasteboardItems?.compactMap {
                 if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
                    let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
-                    urlCallback?(url)
+                    RichTextCallbacks().urlCallback?(url)
                     let fileExtension = url.pathExtension.lowercased()
                     let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
                     if imageExtensions.contains(fileExtension) {
@@ -54,7 +55,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
             } ?? [ImageRepresentable]()
             if images.count > 0 {
                 ForEach(images){image in
-                    dataCallback?(JSONEncoder().encode(image))
+                    RichTextCallbacks().dataCallback?(JSONEncoder().encode(image))
                 }
                 pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             }
@@ -77,7 +78,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         let images = pasteboard.pasteboardItems?.compactMap {
             if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
                let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
-                urlCallback?(url)
+                RichTextCallbacks().urlCallback?(url)
                 let fileExtension = url.pathExtension.lowercased()
                 let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
                 if imageExtensions.contains(fileExtension) {
@@ -88,7 +89,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         } ?? [ImageRepresentable]()
         if images.count > 0 {
             ForEach(images){image in
-                dataCallback?(JSONEncoder().encode(image))
+                RichTextCallbacks().dataCallback?(JSONEncoder().encode(image))
             }
             pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             return true

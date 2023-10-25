@@ -55,7 +55,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
             } ?? [ImageRepresentable]()
             if images.count > 0 {
                 for indeces in 0...images.count{
-                    RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces]))
+                    RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces].jpegData(compressionQuality: 1)))
                 }
                 pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             }
@@ -89,7 +89,7 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         } ?? [ImageRepresentable]()
         if images.count > 0 {
             for indeces in 0...images.count{
-                RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces]))
+                RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces].jpegData(compressionQuality: 1)))
             }
             pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             return true

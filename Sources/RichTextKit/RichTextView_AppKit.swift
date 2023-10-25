@@ -44,7 +44,11 @@ open class RichTextView: NSTextView, RichTextViewComponent {
             let images = pasteboard.pasteboardItems?.compactMap {
                 if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
                    let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
-                    RichTextCallbacks().sendURL(url: url)
+                    do {
+                        try RichTextCallbacks().sendURL(url: url)
+                    } catch {
+                        print("Url callback error")
+                    }
                     let fileExtension = url.pathExtension.lowercased()
                     let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
                     if imageExtensions.contains(fileExtension) {
@@ -55,7 +59,11 @@ open class RichTextView: NSTextView, RichTextViewComponent {
             } ?? [ImageRepresentable]()
             if images.count > 0 {
                 for indeces in 0...images.count{
-                    RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces].jpegData(compressionQuality: 1)))
+                    do {
+                        try RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces].jpegData(compressionQuality: 1)))
+                    } catch {
+                        print("Data callBack error")
+                    }
                 }
                 pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             }
@@ -78,7 +86,11 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         let images = pasteboard.pasteboardItems?.compactMap {
             if let str = $0.string(forType: NSPasteboard.PasteboardType.fileURL),
                let url = URL(string: str), let image = ImageRepresentable(contentsOf: url) {
-                RichTextCallbacks().sendURL(url: url)
+                do {
+                    try RichTextCallbacks().sendURL(url: url)
+                } catch {
+                    print("DragNDrop url error")
+                }
                 let fileExtension = url.pathExtension.lowercased()
                 let imageExtensions = ["jpg", "jpeg", "png", "gif", "tiff", "bmp", "heic"]
                 if imageExtensions.contains(fileExtension) {
@@ -89,7 +101,11 @@ open class RichTextView: NSTextView, RichTextViewComponent {
         } ?? [ImageRepresentable]()
         if images.count > 0 {
             for indeces in 0...images.count{
-                RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces].jpegData(compressionQuality: 1)))
+                do {
+                    try RichTextCallbacks().sendData(data: JSONEncoder().encode(images[indeces].jpegData(compressionQuality: 1)))
+                } catch {
+                    print("DragNDrop data error")
+                }
             }
             pasteImages(images, at: selectedRange().location, moveCursorToPastedContent: true)
             return true
